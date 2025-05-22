@@ -1,14 +1,14 @@
-//  We always walked a very thin line
-//  You didn't even hear me out
-//  You never gave a warning sign
-//  All this time
+//  You taught me a secret language I can't speak with anyone else
+//  And you know damn well
+//  For you, I would ruin myself
+//  A million little times
 
 #include <bits/stdc++.h>
 using namespace std;
 
 typedef int64_t ll;
 
-const ll INF = ll(4e18) + 5;
+const ll inf = ll(4e18) + 5;
 const char nl = '\n';
 
 #ifdef PIKA 
@@ -17,15 +17,15 @@ const char nl = '\n';
 #define dbg(...)
 #endif
 
+
 //	https://github.com/the-tourist/algo/
-//	https://github.com/p1k4-piyush/templates/
 
 
 struct Info {
     int cur;
     
     Info(){
-        cur = 0;
+        cur = -1e9;
     }
 
     Info(int val){
@@ -35,7 +35,9 @@ struct Info {
     
     Info Unite(const Info& b) const {
         Info res;
-        res.cur = cur + b.cur;
+        res.cur = max(cur,b.cur);
+
+
         return res;
     }
 
@@ -43,6 +45,8 @@ struct Info {
         return Info();
     }
 };
+	
+//	https://github.com/the-tourist/algo/
 
 
 namespace seg_tree {
@@ -314,6 +318,9 @@ namespace seg_tree {
 	
 	
 
+//	https://github.com/the-tourist/algo/
+
+
 template <typename Info>
 class SimpleSegmentTree {
     public:
@@ -421,53 +428,80 @@ class SimpleSegmentTree {
 
 
 
-int n,q;
+
+int n,q,l,r,tt;
+map<int,set<int>> mp;
 vector<int> arr;
-vector<pair<pair<int,int>,int>> arr2;
-vector<int> ans;
 
 void solve(){
     cin >> n >> q;
     arr.assign(n,0);
-    arr2.assign(q,{{0,0},0});
-    ans.assign(q,0);
-
+    SimpleSegmentTree<Info> seg(n);    
+    
     for(int i = 0; i < n; i++){
         cin >> arr[i];
-    }
 
-    for(int i = 0; i < q; i++){
-        cin >> arr2[i].first.first >> arr2[i].first.second;
-        arr2[i].second = i;
-    }
-
-    sort(arr2.begin(),arr2.end(),[&](pair<pair<int,int>,int> i, pair<pair<int,int>,int>j){
-        return i.first.second < j.first.second;
-    });
-
-    dbg(arr2);
-    vector<Info> arrr(n,Info(1));
-
-    SimpleSegmentTree<Info> seg(arrr);
-    int cur = 0;
-    map<int,int> mp;
-
-    for (auto i:arr2){
-        while(cur < i.first.second){
-            if(mp.count(arr[cur])){
-                seg.Set(mp[arr[cur]],Info(0));
-                ;
-            }
-            mp[arr[cur]] = cur;
-            cur++;
+        auto it = mp[arr[i]].upper_bound(i);
+        if(it != mp[arr[i]].begin()){
+            it--;
+            dbg(*it);
+            seg.Set(i,Info(*it));
+        }else{
+            seg.Set(i,Info(-1e9));
         }
-        ans[i.second] = seg.Query(i.first.first-1,i.first.second).cur;
+
+        mp[arr[i]].insert(i);
+    }
+    dbg(mp);
+
+    while(q--){
+        cin >> tt >> l >> r;
+        l--;
+        if(tt == 1){
+            auto it = mp[r].upper_bound(l);
+            if(it != mp[r].begin()){
+                it--;
+                dbg(*it);
+                seg.Set(l,Info(*it));
+            }else{
+                dbg(l);
+                seg.Set(l,Info(-1e9));
+            }
+
+            it = mp[r].lower_bound(l);
+            if (it != mp[r].end()){
+                seg.Set(*it,Info(l));
+            }
+
+            mp[arr[l]].erase(l);
+            it = mp[arr[l]].lower_bound(l);
+            if(it != mp[arr[l]].end()){
+
+                if (it != mp[arr[l]].begin()){
+                    seg.Set(*it,Info(*it--));
+                }else{
+                    seg.Set(*it,Info(-1e9));
+                }
+            }
+
+            mp[r].insert(l);
+            arr[l] = r;
+            for(int i = 0; i < n; i++){
+                dbg(seg.Get(i).cur);
+            }
+        }else{
+            int mx = seg.Query(l,r).cur;
+            dbg(mx);
+            dbg(mp);
+            if(mx >= l){
+                cout << "NO" << nl;
+            }else{
+                cout << "YES" << nl;
+            }
+        }
     }
     
-    for(auto i:ans){
-        cout << i << nl;
-    }
-    
+    cout << nl;
     return;
 }
 
@@ -484,4 +518,4 @@ signed main() {
 
 
 // time-limit: 1000
-// problem-url: https://cses.fi/problemset/task/1734
+// problem-url: https://cses.fi/problemset/task/3356

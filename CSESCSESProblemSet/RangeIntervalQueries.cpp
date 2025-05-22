@@ -1,14 +1,13 @@
-//  We always walked a very thin line
-//  You didn't even hear me out
-//  You never gave a warning sign
-//  All this time
+//  I didn't have it in myself to go with grace
+//  And you're the hero flying around, saving face
+//  And if I'm dead to you, why are you at the wake?
 
 #include <bits/stdc++.h>
 using namespace std;
 
 typedef int64_t ll;
 
-const ll INF = ll(4e18) + 5;
+const ll inf = ll(4e18) + 5;
 const char nl = '\n';
 
 #ifdef PIKA 
@@ -18,7 +17,6 @@ const char nl = '\n';
 #endif
 
 //	https://github.com/the-tourist/algo/
-//	https://github.com/p1k4-piyush/templates/
 
 
 struct Info {
@@ -35,7 +33,9 @@ struct Info {
     
     Info Unite(const Info& b) const {
         Info res;
+
         res.cur = cur + b.cur;
+
         return res;
     }
 
@@ -43,6 +43,10 @@ struct Info {
         return Info();
     }
 };
+
+
+	
+//	https://github.com/the-tourist/algo/
 
 
 namespace seg_tree {
@@ -314,6 +318,9 @@ namespace seg_tree {
 	
 	
 
+//	https://github.com/the-tourist/algo/
+
+
 template <typename Info>
 class SimpleSegmentTree {
     public:
@@ -422,51 +429,52 @@ class SimpleSegmentTree {
 
 
 int n,q;
-vector<int> arr;
-vector<pair<pair<int,int>,int>> arr2;
-vector<int> ans;
+map<int,vector<int>> mp;
 
 void solve(){
     cin >> n >> q;
-    arr.assign(n,0);
-    arr2.assign(q,{{0,0},0});
-    ans.assign(q,0);
-
+    int t;
+    
     for(int i = 0; i < n; i++){
-        cin >> arr[i];
+        cin >> t;
+        mp[t].push_back(i);
     }
+
+    SimpleSegmentTree<Info> seg(n);
+
+    vector<tuple<int,int,int,int>> query(q,{0,0,0,0});
+    vector<int> ans(q,0);
+
+    map<tuple<int,int,int>,int> mp2;    
+    vector<tuple<int,int,int>> vec;
 
     for(int i = 0; i < q; i++){
-        cin >> arr2[i].first.first >> arr2[i].first.second;
-        arr2[i].second = i;
+        cin >> get<0>(query[i]) >> get<1>(query[i]) >> get<2>(query[i]) >> get<3>(query[i]);
+        get<0>(query[i])--;
+        vec.push_back({get<2>(query[i])-1,get<0>(query[i]),get<1>(query[i])});
+        vec.push_back({get<3>(query[i]),get<0>(query[i]),get<1>(query[i])});
     }
+    sort(vec.begin(),vec.end());
 
-    sort(arr2.begin(),arr2.end(),[&](pair<pair<int,int>,int> i, pair<pair<int,int>,int>j){
-        return i.first.second < j.first.second;
-    });
-
-    dbg(arr2);
-    vector<Info> arrr(n,Info(1));
-
-    SimpleSegmentTree<Info> seg(arrr);
-    int cur = 0;
-    map<int,int> mp;
-
-    for (auto i:arr2){
-        while(cur < i.first.second){
-            if(mp.count(arr[cur])){
-                seg.Set(mp[arr[cur]],Info(0));
-                ;
+    for(auto i:vec){
+        while(!mp.empty()){
+            auto tt = mp.begin();
+            if(tt->first > get<0>(i)){
+                break;
             }
-            mp[arr[cur]] = cur;
-            cur++;
+            for(auto j:tt->second){
+                seg.Set(j,Info(1));
+            }
+            mp.erase(mp.begin());
         }
-        ans[i.second] = seg.Query(i.first.first-1,i.first.second).cur;
+        mp2[i] = seg.Query(get<1>(i),get<2>(i)).cur;
     }
-    
-    for(auto i:ans){
-        cout << i << nl;
+
+    dbg(mp2);
+    for(auto i:query){
+        cout << mp2[{get<3>(i),get<0>(i),get<1>(i)}] - mp2[{get<2>(i)-1,get<0>(i),get<1>(i)}] << nl; 
     }
+
     
     return;
 }
@@ -484,4 +492,4 @@ signed main() {
 
 
 // time-limit: 1000
-// problem-url: https://cses.fi/problemset/task/1734
+// problem-url: https://cses.fi/problemset/task/3163

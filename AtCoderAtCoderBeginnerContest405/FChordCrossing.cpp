@@ -1,14 +1,13 @@
-//  We always walked a very thin line
-//  You didn't even hear me out
-//  You never gave a warning sign
-//  All this time
+//  And if I'm dead to you, why are you at the wake?
+//  Cursing my name, wishing I stayed
+//  Look at how my tears ricochet
 
 #include <bits/stdc++.h>
 using namespace std;
 
 typedef int64_t ll;
 
-const ll INF = ll(4e18) + 5;
+const ll inf = ll(4e18) + 5;
 const char nl = '\n';
 
 #ifdef PIKA 
@@ -18,7 +17,6 @@ const char nl = '\n';
 #endif
 
 //	https://github.com/the-tourist/algo/
-//	https://github.com/p1k4-piyush/templates/
 
 
 struct Info {
@@ -36,6 +34,7 @@ struct Info {
     Info Unite(const Info& b) const {
         Info res;
         res.cur = cur + b.cur;
+
         return res;
     }
 
@@ -43,6 +42,10 @@ struct Info {
         return Info();
     }
 };
+
+
+	
+//	https://github.com/the-tourist/algo/
 
 
 namespace seg_tree {
@@ -314,6 +317,9 @@ namespace seg_tree {
 	
 	
 
+//	https://github.com/the-tourist/algo/
+
+
 template <typename Info>
 class SimpleSegmentTree {
     public:
@@ -421,53 +427,66 @@ class SimpleSegmentTree {
 
 
 
-int n,q;
-vector<int> arr;
-vector<pair<pair<int,int>,int>> arr2;
-vector<int> ans;
+int n,m,q;
+vector<pair<int,int>> arr;
 
 void solve(){
-    cin >> n >> q;
-    arr.assign(n,0);
-    arr2.assign(q,{{0,0},0});
-    ans.assign(q,0);
-
-    for(int i = 0; i < n; i++){
-        cin >> arr[i];
+    cin >> n >> m;
+    arr.assign(m,{0,0});
+    vector<int> pre(2*n+1,0);
+    
+    for(int i = 0; i < m; i++){
+        cin >> arr[i].first >> arr[i].second;
+        pre[arr[i].first] = 1;
+        pre[arr[i].second] = 1;
     }
 
+    for(int i = 1; i < 2*n+1; i++){
+        pre[i] += pre[i-1];
+    }
+
+    vector<pair<pair<int,int>,int>> vec;
+    cin >> q;
+    int l,r;
+    vector<int> ans(q,0);
     for(int i = 0; i < q; i++){
-        cin >> arr2[i].first.first >> arr2[i].first.second;
-        arr2[i].second = i;
+        cin >> l >> r;
+        if (l < r){
+            ans[i] = pre[r-1]-pre[l];
+            vec.push_back({{l+1,r-1},i});
+        }else{
+            ans[i] = (pre[2*n] - pre[l]) + (pre[r-1] - pre[0]);
+            vec.push_back({{l+1,2*n},i});
+            vec.push_back({{1,r-1},i});
+        }
     }
 
-    sort(arr2.begin(),arr2.end(),[&](pair<pair<int,int>,int> i, pair<pair<int,int>,int>j){
-        return i.first.second < j.first.second;
+    sort(vec.begin(),vec.end(),[&](auto &a, auto &b){
+        return a.first.first > b.first.first;
+    });
+    sort(arr.begin(),arr.end(),[&](auto &a, auto &b){
+        return a.first > b.first;
     });
 
-    dbg(arr2);
-    vector<Info> arrr(n,Info(1));
+    dbg(vec);
+    dbg(arr);
 
-    SimpleSegmentTree<Info> seg(arrr);
-    int cur = 0;
-    map<int,int> mp;
+    SimpleSegmentTree<Info> seg(2*n);
+    int t = 0;
 
-    for (auto i:arr2){
-        while(cur < i.first.second){
-            if(mp.count(arr[cur])){
-                seg.Set(mp[arr[cur]],Info(0));
-                ;
-            }
-            mp[arr[cur]] = cur;
-            cur++;
+    for(auto i:vec){
+        while(t < m && arr[t].first >= i.first.first){
+            seg.Set(arr[t].second-1,1);
+            t++;
         }
-        ans[i.second] = seg.Query(i.first.first-1,i.first.second).cur;
+        ans[i.second] -= 2*seg.Query(i.first.first,i.first.second).cur;
     }
     
     for(auto i:ans){
         cout << i << nl;
     }
     
+    cout << nl;
     return;
 }
 
@@ -483,5 +502,5 @@ signed main() {
 }
 
 
-// time-limit: 1000
-// problem-url: https://cses.fi/problemset/task/1734
+// time-limit: 3000
+// problem-url: https://atcoder.jp/contests/abc405/tasks/abc405_f

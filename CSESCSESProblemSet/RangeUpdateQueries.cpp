@@ -1,34 +1,28 @@
-//  We always walked a very thin line
-//  You didn't even hear me out
-//  You never gave a warning sign
-//  All this time
+//  I was so ahead of the curve, the curve became a sphere
+//  Fell behind all my classmates, and I ended up here
+//  Pouring out my heart to a stranger
+//  But I didn't pour the whiskey
 
 #include <bits/stdc++.h>
 using namespace std;
 
 typedef int64_t ll;
 
-const ll INF = ll(4e18) + 5;
+const ll inf = ll(4e18) + 5;
 const char nl = '\n';
 
-#ifdef PIKA 
-#include "/Users/piyushkeshan/cpp_template_library/template/debug.cpp" 
-#else
-#define dbg(...)
-#endif
 
 //	https://github.com/the-tourist/algo/
-//	https://github.com/p1k4-piyush/templates/
 
 
 struct Info {
-    int cur;
+    ll cur;
     
     Info(){
         cur = 0;
     }
 
-    Info(int val){
+    Info(ll val){
         cur = val;
     }
 
@@ -36,6 +30,7 @@ struct Info {
     Info Unite(const Info& b) const {
         Info res;
         res.cur = cur + b.cur;
+
         return res;
     }
 
@@ -43,6 +38,40 @@ struct Info {
         return Info();
     }
 };
+
+
+
+//	https://github.com/the-tourist/algo/
+
+
+struct Tag {
+    ll add;
+
+    Tag(){
+        add = 0;
+    }
+
+    Tag(ll val){
+        add = val;
+    }
+
+    bool ApplyTo(Info& a, [[maybe_unused]] int l, [[maybe_unused]] int r) const {
+        a.cur += add;        
+        return true;
+    }
+
+    void ApplyTo(Tag& t) const { 
+        t.add += add;
+    }
+
+    bool Empty() const {
+
+        return add == 0;
+    }
+};
+
+	
+//	https://github.com/the-tourist/algo/
 
 
 namespace seg_tree {
@@ -314,33 +343,76 @@ namespace seg_tree {
 	
 	
 
-template <typename Info>
-class SimpleSegmentTree {
+//	https://github.com/the-tourist/algo/
+
+
+template <typename Info, typename Tag>
+class LazySegmentTree {
     public:
         int n;
         vector<Info> infos;
+        vector<Tag> tags;
         seg_tree::in_order_layout layout;
+
+        void Apply(seg_tree::point a, const Tag& t) {
+            auto [l, r] = layout.get_node_bounds(a);
+            if (!t.ApplyTo(infos[a], l, r)) {
+                assert(a < n);
+                DowndateNode(a);
+                Apply(a.c(0), t);
+                Apply(a.c(1), t);
+                UpdateNode(a);
+                return;
+            }
+            if (a < n) {
+                t.ApplyTo(tags[a]);
+            }
+        }
+
+        void DowndateNode(seg_tree::point a) {
+            if (!tags[a].Empty()) {
+                Apply(a.c(0), tags[a]);
+                Apply(a.c(1), tags[a]);
+                tags[a] = Tag();
+            }
+        }
 
         void UpdateNode(seg_tree::point a) {
             infos[a] = infos[a.c(0)].Unite(infos[a.c(1)]);
-        } 
-  
-        SimpleSegmentTree(int n_) : SimpleSegmentTree(vector<Info>(n_)) {}
+        }
 
-        SimpleSegmentTree(const vector<Info>& a) : n(int(a.size())) {
-            assert(n > 0);
+        LazySegmentTree() : LazySegmentTree(0) {}
+        LazySegmentTree(int n_) : LazySegmentTree(vector<Info>(n_)) {}
+        LazySegmentTree(const vector<Info>& a) : n(int(a.size())) {
             infos.resize(2 * n);
+            tags.resize(n);
             layout = seg_tree::in_order_layout(n);
             for (int i = 0; i < n; i++) {
                 infos[layout.get_point(i)] = a[i];
             }
             for (int i = n - 1; i >= 1; i--) {
-                infos[i] = infos[2 * i].Unite(infos[2 * i + 1]);
+                UpdateNode(seg_tree::point(i));
             }
+        }
+
+        void Modify(int l, int r, const Tag& t) {
+            auto rng = layout.get_range(l, r);
+            rng.for_parents_down([&](seg_tree::point a) {
+                DowndateNode(a);
+            });
+            rng.for_each([&](seg_tree::point a) {
+                Apply(a, t);
+            });
+            rng.for_parents_up([&](seg_tree::point a) {
+                UpdateNode(a);
+            });
         }
 
         void Set(int p, const Info& v) {
             auto pt = layout.get_point(p);
+            pt.for_parents_down([&](seg_tree::point a) {
+                DowndateNode(a);
+            });
             infos[pt] = v;
             pt.for_parents_up([&](seg_tree::point a) {
                 UpdateNode(a);
@@ -349,6 +421,9 @@ class SimpleSegmentTree {
 
         Info Query(int l, int r) {
             auto rng = layout.get_range(l, r);
+            rng.for_parents_down([&](seg_tree::point a) {
+                DowndateNode(a);
+            });
             Info res;
             rng.for_each_l_to_r([&](seg_tree::point a) {
                 res = res.Unite(infos[a]);
@@ -358,12 +433,18 @@ class SimpleSegmentTree {
 
         Info Get(int p) {
             auto pt = layout.get_point(p);
+            pt.for_parents_down([&](seg_tree::point a) {
+                DowndateNode(a);
+            });
             return infos[pt];
         }
 
         template<typename F>
         int MaxRight(int l, F f) {
             auto rng = layout.get_range(l, n);
+            rng.for_parents_down([&](seg_tree::point a) {
+                DowndateNode(a);
+            });
             int res = n;
             Info sum;
             rng.for_each_l_to_r([&](seg_tree::point a) {
@@ -376,6 +457,7 @@ class SimpleSegmentTree {
                     return;
                 }
                 while (a < n) {
+                    DowndateNode(a);
                     new_sum = sum.Unite(infos[a.c(0)]);
                     if (f(new_sum)) {
                         sum = new_sum;
@@ -392,6 +474,9 @@ class SimpleSegmentTree {
         template<typename F>
         int MinLeft(int r, F f) {
             auto rng = layout.get_range(0, r);
+            rng.for_parents_down([&](seg_tree::point a) {
+                DowndateNode(a);
+            });
             int res = 0;
             Info sum;
             rng.for_each_r_to_l([&](seg_tree::point a) {
@@ -404,6 +489,7 @@ class SimpleSegmentTree {
                     return;
                 }
                 while (a < n) {
+                    DowndateNode(a);
                     new_sum = infos[a.c(1)].Unite(sum);
                     if (f(new_sum)) {
                         sum = new_sum;
@@ -412,7 +498,6 @@ class SimpleSegmentTree {
                         a = a.c(1);
                     }
                 }
-
                 res = layout.get_node_bounds(a)[1];
             });
             return res;
@@ -421,51 +506,37 @@ class SimpleSegmentTree {
 
 
 
-int n,q;
-vector<int> arr;
-vector<pair<pair<int,int>,int>> arr2;
-vector<int> ans;
+
+#ifdef PIKA 
+#include "/Users/piyushkeshan/cpp_template_library/template/debug.cpp" 
+#else
+#define dbg(...)
+#endif
+
+ll n,q,t,l,r,u;
 
 void solve(){
     cin >> n >> q;
-    arr.assign(n,0);
-    arr2.assign(q,{{0,0},0});
-    ans.assign(q,0);
-
-    for(int i = 0; i < n; i++){
-        cin >> arr[i];
-    }
-
-    for(int i = 0; i < q; i++){
-        cin >> arr2[i].first.first >> arr2[i].first.second;
-        arr2[i].second = i;
-    }
-
-    sort(arr2.begin(),arr2.end(),[&](pair<pair<int,int>,int> i, pair<pair<int,int>,int>j){
-        return i.first.second < j.first.second;
-    });
-
-    dbg(arr2);
-    vector<Info> arrr(n,Info(1));
-
-    SimpleSegmentTree<Info> seg(arrr);
-    int cur = 0;
-    map<int,int> mp;
-
-    for (auto i:arr2){
-        while(cur < i.first.second){
-            if(mp.count(arr[cur])){
-                seg.Set(mp[arr[cur]],Info(0));
-                ;
-            }
-            mp[arr[cur]] = cur;
-            cur++;
-        }
-        ans[i.second] = seg.Query(i.first.first-1,i.first.second).cur;
-    }
+    vector<Info> arr(n);
     
-    for(auto i:ans){
-        cout << i << nl;
+    for(int i = 0; i < n; i++){
+        cin >> t;
+        arr[i] = t;;
+    }
+
+    LazySegmentTree<Info, Tag> seg(arr);
+
+    while(q--){
+        cin >> t;
+        if(t == 1){
+            cin >> l >> r >> u;
+            l--;
+            seg.Modify(l,r,Tag(u));
+        }else{
+            cin >> l;
+            l--;
+            cout << seg.Get(l).cur << nl;
+        }
     }
     
     return;
@@ -475,13 +546,10 @@ void solve(){
 signed main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int t = 1;
-    while(t--){
         solve();
-    }
     return 0;
 }
 
 
 // time-limit: 1000
-// problem-url: https://cses.fi/problemset/task/1734
+// problem-url: https://cses.fi/problemset/task/1651

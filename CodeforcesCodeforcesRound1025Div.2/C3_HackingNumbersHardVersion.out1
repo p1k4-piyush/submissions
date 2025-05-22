@@ -1,0 +1,8 @@
+mul 999999999
+digit
+add 19
+!
+mul 999999999
+digit
+add -76
+!

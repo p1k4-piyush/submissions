@@ -1,14 +1,13 @@
-//  We always walked a very thin line
-//  You didn't even hear me out
-//  You never gave a warning sign
-//  All this time
+//  I knew you
+//  Your heartbeat on the High Line
+//  Once in 20 lifetimes, I
 
 #include <bits/stdc++.h>
 using namespace std;
 
 typedef int64_t ll;
 
-const ll INF = ll(4e18) + 5;
+const ll inf = ll(4e18) + 5;
 const char nl = '\n';
 
 #ifdef PIKA 
@@ -18,17 +17,16 @@ const char nl = '\n';
 #endif
 
 //	https://github.com/the-tourist/algo/
-//	https://github.com/p1k4-piyush/templates/
 
 
 struct Info {
-    int cur;
+    ll cur;
     
     Info(){
         cur = 0;
     }
 
-    Info(int val){
+    Info(ll val){
         cur = val;
     }
 
@@ -36,6 +34,7 @@ struct Info {
     Info Unite(const Info& b) const {
         Info res;
         res.cur = cur + b.cur;
+
         return res;
     }
 
@@ -43,6 +42,8 @@ struct Info {
         return Info();
     }
 };
+	
+//	https://github.com/the-tourist/algo/
 
 
 namespace seg_tree {
@@ -314,6 +315,9 @@ namespace seg_tree {
 	
 	
 
+//	https://github.com/the-tourist/algo/
+
+
 template <typename Info>
 class SimpleSegmentTree {
     public:
@@ -420,54 +424,26 @@ class SimpleSegmentTree {
 };
 
 
-
 int n,q;
-vector<int> arr;
-vector<pair<pair<int,int>,int>> arr2;
-vector<int> ans;
+vector<Info> arr;
 
 void solve(){
     cin >> n >> q;
-    arr.assign(n,0);
-    arr2.assign(q,{{0,0},0});
-    ans.assign(q,0);
+    arr.assign(n,Info(0));
+    ll t,tt;
 
     for(int i = 0; i < n; i++){
-        cin >> arr[i];
-    }
-
-    for(int i = 0; i < q; i++){
-        cin >> arr2[i].first.first >> arr2[i].first.second;
-        arr2[i].second = i;
-    }
-
-    sort(arr2.begin(),arr2.end(),[&](pair<pair<int,int>,int> i, pair<pair<int,int>,int>j){
-        return i.first.second < j.first.second;
-    });
-
-    dbg(arr2);
-    vector<Info> arrr(n,Info(1));
-
-    SimpleSegmentTree<Info> seg(arrr);
-    int cur = 0;
-    map<int,int> mp;
-
-    for (auto i:arr2){
-        while(cur < i.first.second){
-            if(mp.count(arr[cur])){
-                seg.Set(mp[arr[cur]],Info(0));
-                ;
-            }
-            mp[arr[cur]] = cur;
-            cur++;
-        }
-        ans[i.second] = seg.Query(i.first.first-1,i.first.second).cur;
+        cin >> t;
+        arr[i] = Info(t);
     }
     
-    for(auto i:ans){
-        cout << i << nl;
+    SimpleSegmentTree<Info> seg(arr);
+    while(q--){
+        cin >> t >> tt;
+        cout << seg.Query(t-1,tt).cur << nl;
     }
     
+    cout << nl;
     return;
 }
 
@@ -484,4 +460,4 @@ signed main() {
 
 
 // time-limit: 1000
-// problem-url: https://cses.fi/problemset/task/1734
+// problem-url: https://cses.fi/problemset/task/1646
