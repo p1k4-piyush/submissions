@@ -1,37 +1,27 @@
-//  I didn't have it in myself to go with grace
-//  And you're the hero flying around, saving face
-//  And if I'm dead to you, why are you at the wake?
-
-
 #include <bits/stdc++.h>
 using namespace std;
 
 typedef int64_t ll;
-#define all(x) (x).begin(), (x).end()
 
-const ll INF = ll(4e18) + 5;
+const ll inf = ll(4e18) + 5;
 const char nl = '\n';
 
-#ifdef DEBUG 
-#include "/home/dbg/debug.cpp" 
+#ifdef PIKA 
+#include "/Users/piyushkeshan/cpp_template_library/template/debug.cpp" 
 #else
 #define dbg(...)
 #endif
 
-const int MAX_N = 2e5+100;
 int n;
-vector<pair<int,int>> arr;
+vector<int> arr;
 
 void solve(){
     cin >> n;
-    arr.resize(n);
+    arr.assign(n,0);
     
     for(int i = 0; i < n; i++){
-        cin >> arr[i].first >> arr[i].second;
+        cin >> arr[i];
     }
-
-    
-    
     
     
     cout << nl;
@@ -51,9 +41,5 @@ signed main() {
 }
 
 
-
 // time-limit: 3000
-// problem-url: https://codeforces.com/contest/2046/problem/C
-
-// time-limit: 3000
-// problem-url: https://codeforces.com/contest/2046/problem/C
+// problem-url: https://codeforces.com/problemset/problem/2046/C
