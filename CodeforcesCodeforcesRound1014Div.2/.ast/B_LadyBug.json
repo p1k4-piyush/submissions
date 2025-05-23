@@ -1,1 +1,0 @@
-{"src_ft":"cpp","src_ext":"cpp","src_name":"B_LadyBug","tests":[{"output":"1\n1\n1","time_taken":0.007,"input":"1\n1\n1","status":{"text":"Wrong answer","hl":"AstTextRed"},"expected":"","stdout":"NO\n","stderr":"E\n"}],"need_compilation":false}
