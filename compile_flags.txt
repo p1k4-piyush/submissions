@@ -1,4 +1,0 @@
--std=c++23
--O3
--fsanitize=undefined,address
-

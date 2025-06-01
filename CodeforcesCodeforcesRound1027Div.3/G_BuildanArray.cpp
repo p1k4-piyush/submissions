@@ -12,42 +12,45 @@ typedef int64_t ll;
 const ll inf = ll(4e18) + 5;
 const char nl = '\n';
 
-#ifdef PIKA 
-#include "/Users/piyushkeshan/cpp_template_library/template/debug.cpp" 
+#ifdef PIKA
+#include "/Users/piyushkeshan/cpp_template_library/template/debug.cpp"
 #else
 #define dbg(...)
 #endif
 
-ll f(ll a, ll b){
+ll f(ll a, ll b)
+{
     ll t = b;
-    while(t%ll(2) == 0){
+    while (t % ll(2) == 0) {
         t /= ll(2);
     }
-    if(a%t || b%a){
-        return b/t;
-    }else{
-        return b/t-ll(2)*a/t+ll(1);
+    if (a % t || b % a) {
+        return b / t;
+    } else {
+        return b / t - ll(2) * a / t + ll(1);
     }
 }
 
-void evermore(){
-    ll n,k;
+void evermore()
+{
+    ll n, k;
     cin >> n >> k;
-    vector<ll> arr(n,0);
-    for(auto &i:arr){
+    vector<ll> arr(n, 0);
+    for (auto& i : arr) {
         cin >> i;
     }
-    vector<ll> L(n,0), R(n,0);
-    for(int i = 1; i < n; i++){
-        L[i] = L[i-1] + f(arr[i],arr[i-1]);
+    vector<ll> L(n, 0), R(n, 0);
+    for (int i = 1; i < n; i++) {
+        L[i] = L[i - 1] + f(arr[i], arr[i - 1]);
     }
-    for(int i = n-2; i >= 0; i--){
-        R[i] = R[i+1]+f(arr[i],arr[i+1]);
+    for (int i = n - 2; i >= 0; i--) {
+        R[i] = R[i + 1] + f(arr[i], arr[i + 1]);
     }
-    for(int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         ll t = arr[i];
-        while(t%2 == 0) t/= ll(2);
-        if(arr[i]/t+L[i]+R[i]>=k){
+        while (t % 2 == 0)
+            t /= ll(2);
+        if (arr[i] / t + L[i] + R[i] >= k) {
             cout << "YES" << nl;
             return;
         }
@@ -57,18 +60,17 @@ void evermore(){
     return;
 }
 
-
-signed main() {
+signed main()
+{
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     int number_of_albums = 1;
     cin >> number_of_albums;
-    while(number_of_albums--){
+    while (number_of_albums--) {
         evermore();
     }
     return 0;
 }
-
 
 // time-limit: 1000
 // problem-url: https://codeforces.com/contest/2114/problem/G
