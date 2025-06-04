@@ -1,6 +1,7 @@
-//  Vintage tee, brand new phone
-//  High heels on cobblestones
-//  When you are young, they assume you know nothing
+//  I think I've seen this film before
+//  And I didn't like the ending
+//  You're not my homeland anymore
+//  So what am I defending now?
 
 #include "bits/stdc++.h"
 using namespace std;
@@ -21,13 +22,29 @@ void evermore()
 {
     int n;
     cin >> n;
-    vector<int> arr(n, 0);
+    vector<ll> ans(n + 1, 0);
+    vector<ll> arr(n + 1, 0);
+    ll cur = 0;
+    ll prev = -1;
 
     for (int i = 0; i < n; i++) {
         cin >> arr[i];
+        if (arr[i] == prev) {
+            cur++;
+        } else {
+            cur = 1;
+            prev = arr[i];
+        }
+        ans[arr[i]] = max(ans[arr[i]], cur);
+    }
+    ll a = inf;
+    for (ll i = 1; i <= n; i++) {
+        if (ans[i] != 0) {
+            a = min(a, i * (n - ans[i]));
+        }
     }
 
-    cout << nl;
+    cout << a << nl;
     return;
 }
 
@@ -43,4 +60,3 @@ signed main()
     return 0;
 }
 // time-limit: 3000
-// problem-url: https://codeforces.com/problemset/problem/2108/D

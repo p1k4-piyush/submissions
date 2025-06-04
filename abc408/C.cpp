@@ -12,7 +12,7 @@ const ll inf = ll(4e18) + 5;
 const char nl = '\n';
 
 #ifdef PIKA
-#include "/Users/piyushkeshan/cpp_template_library/template/debug.cpp"
+#include "/Users/piyushkeshan/Documents/cpp_template_library/template/debug.cpp"
 #else
 #define dbg(...)
 #endif
@@ -22,10 +22,7 @@ const char nl = '\n';
 namespace seg_tree {
 
 // Floor of log_2(a); index of highest 1-bit
-inline int floor_log_2(int a)
-{
-    return a ? bit_width(unsigned(a)) - 1 : -1;
-}
+inline int floor_log_2(int a) { return a ? bit_width(unsigned(a)) - 1 : -1; }
 
 struct point {
     int a;
@@ -39,31 +36,16 @@ struct point {
         assert(a >= -1);
     }
 
-    explicit operator bool()
-    {
-        return bool(a);
-    }
+    explicit operator bool() { return bool(a); }
 
     // This is useful so you can directly do array indices
-    /* implicit */ operator int() const
-    {
-        return a;
-    }
+    /* implicit */ operator int() const { return a; }
 
-    point c(bool z) const
-    {
-        return point((a << 1) | z);
-    }
+    point c(bool z) const { return point((a << 1) | z); }
 
-    point operator[](bool z) const
-    {
-        return c(z);
-    }
+    point operator[](bool z) const { return c(z); }
 
-    point p() const
-    {
-        return point(a >> 1);
-    }
+    point p() const { return point(a >> 1); }
 
     friend std::ostream& operator<<(std::ostream& o, const point& p)
     {
@@ -100,19 +82,13 @@ struct point {
         ++a;
         return *this;
     }
-    point operator++(int)
-    {
-        return point(a++);
-    }
+    point operator++(int) { return point(a++); }
     point& operator--()
     {
         --a;
         return *this;
     }
-    point operator--(int)
-    {
-        return point(a--);
-    }
+    point operator--(int) { return point(a--); }
 };
 
 struct range {
@@ -133,15 +109,9 @@ struct range {
     {
     }
 
-    explicit operator std::array<int, 2>() const
-    {
-        return { a, b };
-    }
+    explicit operator std::array<int, 2>() const { return { a, b }; }
 
-    const int& operator[](bool z) const
-    {
-        return z ? b : a;
-    }
+    const int& operator[](bool z) const { return z ? b : a; }
 
     friend std::ostream& operator<<(std::ostream& o, const range& r)
     {
@@ -277,13 +247,11 @@ struct in_order_layout {
         if (n == 0)
             return range();
         a += s, b += s;
-        return range((a >= 2 * n ? 2 * (a - n) : a), (b >= 2 * n ? 2 * (b - n) : b));
+        return range((a >= 2 * n ? 2 * (a - n) : a),
+            (b >= 2 * n ? 2 * (b - n) : b));
     }
 
-    range get_range(std::array<int, 2> p) const
-    {
-        return get_range(p[0], p[1]);
-    }
+    range get_range(std::array<int, 2> p) const { return get_range(p[0], p[1]); }
 
     int get_leaf_index(point pt) const
     {
@@ -299,7 +267,8 @@ struct in_order_layout {
         int l = countl_zero(unsigned(a)) - countl_zero(unsigned(2 * n - 1));
         int x = a << l, y = (a + 1) << l;
         assert(s <= x && x < y && y <= 2 * s);
-        return { (x >= 2 * n ? (x >> 1) + n : x) - s, (y >= 2 * n ? (y >> 1) + n : y) - s };
+        return { (x >= 2 * n ? (x >> 1) + n : x) - s,
+            (y >= 2 * n ? (y >> 1) + n : y) - s };
     }
 
     int get_node_split(point pt) const
@@ -348,10 +317,7 @@ struct circular_layout {
         return range(n + a, n + b);
     }
 
-    range get_range(std::array<int, 2> p) const
-    {
-        return get_range(p[0], p[1]);
-    }
+    range get_range(std::array<int, 2> p) const { return get_range(p[0], p[1]); }
 
     int get_leaf_index(point pt) const
     {
@@ -492,28 +458,27 @@ public:
         rng.for_parents_down([&](seg_tree::point a) { DowndateNode(a); });
         int res = n;
         Info sum;
-        rng.for_each_l_to_r(
-            [&](seg_tree::point a) {
-                if (res != n) {
-                    return;
-                }
-                auto new_sum = sum.Unite(infos[a]);
+        rng.for_each_l_to_r([&](seg_tree::point a) {
+            if (res != n) {
+                return;
+            }
+            auto new_sum = sum.Unite(infos[a]);
+            if (f(new_sum)) {
+                sum = new_sum;
+                return;
+            }
+            while (a < n) {
+                DowndateNode(a);
+                new_sum = sum.Unite(infos[a.c(0)]);
                 if (f(new_sum)) {
                     sum = new_sum;
-                    return;
+                    a = a.c(1);
+                } else {
+                    a = a.c(0);
                 }
-                while (a < n) {
-                    DowndateNode(a);
-                    new_sum = sum.Unite(infos[a.c(0)]);
-                    if (f(new_sum)) {
-                        sum = new_sum;
-                        a = a.c(1);
-                    } else {
-                        a = a.c(0);
-                    }
-                }
-                res = layout.get_node_bounds(a)[0];
-            });
+            }
+            res = layout.get_node_bounds(a)[0];
+        });
         return res;
     }
 
@@ -524,28 +489,27 @@ public:
         rng.for_parents_down([&](seg_tree::point a) { DowndateNode(a); });
         int res = 0;
         Info sum;
-        rng.for_each_r_to_l(
-            [&](seg_tree::point a) {
-                if (res != 0) {
-                    return;
-                }
-                auto new_sum = infos[a].Unite(sum);
+        rng.for_each_r_to_l([&](seg_tree::point a) {
+            if (res != 0) {
+                return;
+            }
+            auto new_sum = infos[a].Unite(sum);
+            if (f(new_sum)) {
+                sum = new_sum;
+                return;
+            }
+            while (a < n) {
+                DowndateNode(a);
+                new_sum = infos[a.c(1)].Unite(sum);
                 if (f(new_sum)) {
                     sum = new_sum;
-                    return;
+                    a = a.c(0);
+                } else {
+                    a = a.c(1);
                 }
-                while (a < n) {
-                    DowndateNode(a);
-                    new_sum = infos[a.c(1)].Unite(sum);
-                    if (f(new_sum)) {
-                        sum = new_sum;
-                        a = a.c(0);
-                    } else {
-                        a = a.c(1);
-                    }
-                }
-                res = layout.get_node_bounds(a)[1];
-            });
+            }
+            res = layout.get_node_bounds(a)[1];
+        });
         return res;
     }
 };
@@ -555,15 +519,9 @@ public:
 struct Info {
     ll mn;
 
-    Info()
-    {
-        mn = inf;
-    }
+    Info() { mn = inf; }
 
-    Info(ll val)
-    {
-        mn = val;
-    }
+    Info(ll val) { mn = val; }
 
     Info Unite(const Info& b) const
     {
@@ -583,15 +541,9 @@ struct Info {
 struct Tag {
     ll add;
 
-    Tag()
-    {
-        add = 0;
-    }
+    Tag() { add = 0; }
 
-    Tag(int val)
-    {
-        add = val;
-    }
+    Tag(int val) { add = val; }
 
     bool ApplyTo(Info& a, [[maybe_unused]] int l, [[maybe_unused]] int r) const
     {
@@ -600,17 +552,9 @@ struct Tag {
         return true;
     }
 
-    void ApplyTo(Tag& t) const
-    {
+    void ApplyTo(Tag& t) const { t.add += add; }
 
-        t.add += add;
-    }
-
-    bool Empty() const
-    {
-
-        return add == 0;
-    }
+    bool Empty() const { return add == 0; }
 };
 
 void evermore()

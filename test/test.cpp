@@ -1,8 +1,9 @@
-//  Sequin smile, black lipstick
-//  Sensual politics
-//  When you are young, they assume you know nothing
+//  I was so ahead of the curve, the curve became a sphere
+//  Fell behind all my classmates, and I ended up here
+//  Pouring out my heart to a stranger
+//  But I didn't pour the whiskey
 
-#include <bits/stdc++.h>
+#include "bits/stdc++.h"
 using namespace std;
 
 typedef int64_t ll;
@@ -17,21 +18,16 @@ const char nl = '\n';
 #define dbg(...)
 #endif
 
-int arr[int(1e6 + 100)];
-
 void evermore()
 {
-    int n, m, l, r;
-    cin >> n >> m;
+    int n;
+    cin >> n;
+    vector<int> arr(n, 0);
 
-    for (int i = 0; i < m; i++) {
-        cin >> l >> r;
-        arr[l - 1]++;
-        arr[r]--;
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i];
     }
 
-    partial_sum(arr, arr + n + 1, arr);
-    cout << *min_element(arr, arr + n);
     cout << nl;
     return;
 }
@@ -41,10 +37,10 @@ signed main()
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     int number_of_albums = 1;
+    cin >> number_of_albums;
     while (number_of_albums--) {
         evermore();
     }
     return 0;
 }
-// time-limit: 2000
-// problem-url: https://atcoder.jp/contests/abc408/tasks/abc408_c
+// time-limit: 3000

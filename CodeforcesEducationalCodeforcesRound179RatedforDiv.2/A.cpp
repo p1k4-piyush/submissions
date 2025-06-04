@@ -1,6 +1,7 @@
-//  Vintage tee, brand new phone
-//  High heels on cobblestones
-//  When you are young, they assume you know nothing
+//  And they called off the circus
+//  Burned the disco down
+//  When they sent home the horses
+//  And the rodeo clowns
 
 #include "bits/stdc++.h"
 using namespace std;
@@ -19,15 +20,18 @@ const char nl = '\n';
 
 void evermore()
 {
-    int n;
+    ll n;
     cin >> n;
-    vector<int> arr(n, 0);
 
-    for (int i = 0; i < n; i++) {
-        cin >> arr[i];
+    ll cur = 1;
+    ll ans = 2;
+    while (cur < n) {
+        cur <<= 1;
+        cur++;
+        ans += 2;
     }
 
-    cout << nl;
+    cout << ans + 1 << nl;
     return;
 }
 
@@ -43,4 +47,3 @@ signed main()
     return 0;
 }
 // time-limit: 3000
-// problem-url: https://codeforces.com/problemset/problem/2108/D
