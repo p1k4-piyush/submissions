@@ -1,9 +1,4 @@
-//  And I can go anywhere I want
-//  Anywhere I want, just not home
-//  And you can aim for my heart, go for blood
-//  But you would still miss me in your bones
-
-#include <bits/stdc++.h>
+#include "bits/stdc++.h"
 using namespace std;
 
 typedef int64_t ll;
@@ -20,20 +15,15 @@ const char nl = '\n';
 
 void evermore()
 {
-    int n, s;
-    cin >> n >> s;
-    bool c = 1;
-    int prev = 0;
-    int t;
+    int n;
+    cin >> n;
+    vector<int> arr(n, 0);
 
     for (int i = 0; i < n; i++) {
-        cin >> t;
-        if (c && (t - prev) > s) {
-            c = 0;
-        }
-        prev = t;
+        cin >> arr[i];
     }
-    cout << (c ? "Yes" : "No") << nl;
+
+    cout << nl;
     return;
 }
 
@@ -42,9 +32,11 @@ signed main()
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     int number_of_albums = 1;
+    cin >> number_of_albums;
     while (number_of_albums--) {
         evermore();
     }
     return 0;
 }
-// time-limit: 3000
+// time-limit: 1000
+// problem-url: https://www.codechef.com/START189A/problems/NUTRICOST

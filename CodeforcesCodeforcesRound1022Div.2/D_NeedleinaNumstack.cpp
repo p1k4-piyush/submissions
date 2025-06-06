@@ -19,12 +19,33 @@ const char nl = '\n';
 
 void evermore()
 {
-    int n;
-    cin >> n;
-    vector<int> arr(n, 0);
+    int n, k;
+    cin >> n >> k;
+    vector<int> a(k), b(k);
 
-    for (int i = 0; i < n; i++) {
-        cin >> arr[i];
+    for (int i = 0; i < k; i++) {
+        cout << "? " << i + 1 << nl;
+        cout.flush();
+        cin >> a[i];
+    }
+
+    for (int i = n - k; i < n; i++) {
+        cout << "? " << i + 1 << nl;
+        cout.flush();
+        cin >> b[i % k];
+    }
+    dbg(a);
+    dbg(b);
+
+    if (a == b) {
+        if (n == k + k) {
+            cout << "! " << k << " " << k << nl;
+            cout.flush();
+            return;
+        }
+        cout << "! " << -1 << nl;
+        cout.flush();
+        return;
     }
 
     cout << nl;
