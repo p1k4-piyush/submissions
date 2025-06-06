@@ -1,12 +1,12 @@
-//  Vintage tee, brand new phone
-//  High heels on cobblestones
-//  When you are young, they assume you know nothing
+//  You know I didn't want to have to haunt you
+//  But what a ghostly scene
+//  You wear the same jewels that I gave you
+//  As you bury me
 
 #include "bits/stdc++.h"
 using namespace std;
 
 typedef int64_t ll;
-// #define int ll
 
 const ll inf = ll(4e18) + 5;
 const char nl = '\n';
@@ -19,33 +19,12 @@ const char nl = '\n';
 
 void evermore()
 {
-    int n, k;
-    cin >> n >> k;
-    vector<int> a(k), b(k);
+    int n;
+    cin >> n;
+    vector<int> arr(n, 0);
 
-    for (int i = 0; i < k; i++) {
-        cout << "? " << i + 1 << nl;
-        cout.flush();
-        cin >> a[i];
-    }
-
-    for (int i = n - k; i < n; i++) {
-        cout << "? " << i + 1 << nl;
-        cout.flush();
-        cin >> b[i % k];
-    }
-    dbg(a);
-    dbg(b);
-
-    if (a == b) {
-        if (n == k + k) {
-            cout << "! " << k << " " << k << nl;
-            cout.flush();
-            return;
-        }
-        cout << "! " << -1 << nl;
-        cout.flush();
-        return;
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i];
     }
 
     cout << nl;
