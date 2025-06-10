@@ -1,12 +1,12 @@
-//  Gold was color of the leaves
-//  When I showed you around Centennial Park
-//  Hell was the journey but it brought me heaven
+//  Even on my worst day, did I deserve, babe
+//  All the hell you gave me?
+//  'Cause I loved you, swear I loved you
+//  'Til my dying day
 
 #include "bits/stdc++.h"
 using namespace std;
 
 typedef int64_t ll;
-// #define int ll
 
 const ll inf = ll(4e18) + 5;
 const char nl = '\n';
@@ -27,7 +27,18 @@ void evermore()
         cin >> arr[i];
     }
 
-    cout << nl;
+    sort(arr.begin(), arr.end());
+    int lo = 0, hi = n;
+    while (hi > lo) {
+        int mid = (hi + lo + 1) / 2;
+        if (n - (lower_bound(arr.begin(), arr.end(), mid) - arr.begin()) >= mid) {
+            lo = mid;
+        } else {
+            hi = mid - 1;
+        }
+    }
+
+    cout << lo << nl;
     return;
 }
 
@@ -36,11 +47,10 @@ signed main()
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     int number_of_albums = 1;
-    cin >> number_of_albums;
     while (number_of_albums--) {
         evermore();
     }
     return 0;
 }
 // time-limit: 2000
-// problem-url: https://codeforces.com/contest/2111/problem/F
+// problem-url: https://atcoder.jp/contests/abc409/tasks/abc409_b
